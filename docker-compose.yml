@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:16
+    restart: always
+    env_file: .env
+    network_mode: host
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+
+  bot:
+    build: ./bot
+    restart: always
+    env_file: .env
+    network_mode: host
+    depends_on:
+      - db
