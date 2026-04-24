@@ -20,6 +20,8 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            sudo systemctl restart shadowsocks-libev-local@local
+            sleep 3
             cd ~/foodbot
             git pull origin main
             docker compose down
