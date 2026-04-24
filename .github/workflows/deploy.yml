@@ -20,9 +20,15 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            echo "${{ secrets.SSH_PASSWORD }}" | sudo -S systemctl restart shadowsocks-libev-local@local
+            sudo systemctl restart shadowsocks-libev-local@local > /dev/null 2>&1
             sleep 3
             cd ~/foodbot
             git pull origin main
             docker compose down
-            docker compose up -d --build
+            
+            # Перенаправляем логи сборки в /dev/null, 
+            # чтобы SSH не ждал "хвостов" от докера
+            docker compose up -d --build > /dev/null 2>&1
+            
+            # Принудительно закрываем SSH сессию
+            exit 0
