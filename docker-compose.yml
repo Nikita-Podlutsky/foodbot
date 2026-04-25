@@ -1,16 +1,39 @@
+version: '3.8'
+
 services:
   db:
     image: postgres:16
     restart: always
     env_file: .env
-    network_mode: host
     volumes:
-      - ./postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
+
+  ollama:
+    image: ollama/ollama:latest
+    restart: always
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
 
   bot:
     build: ./bot
     restart: always
     env_file: .env
-    network_mode: host
     depends_on:
       - db
+      - ollama
+    volumes:
+      # ВОТ ЗДЕСЬ ДОЛЖНА БЫТЬ ПАПКА С КОДОМ БОТА!
+      - ./bot:/app
+
+volumes:
+  postgres_data:
+  ollama_data:
